@@ -172,6 +172,7 @@ class HomarusControllerTest extends TestCase
         $request->attributes->set('fedora_resource', $mock_fedora_response);
 
         $response = $controller->convert($request);
+        $response->sendContent();
         $this->assertEquals(200, $response->getStatusCode(), "Response must return 200");
         $this->assertEquals('video/mp4', $response->headers->get('Content-type'), "Content-type must be video/mp4");
     }
@@ -216,6 +217,9 @@ class HomarusControllerTest extends TestCase
     {
         // Mock a CmdExecuteService.
         $prophecy = $this->prophesize(CmdExecuteService::class);
+        $prophecy->execute(Argument::any(), Argument::any())->will(function () {
+            fclose(fopen(__DIR__ . "/../../../../static/foo.mp4", 'w'));
+        });
         $mock_service = $prophecy->reveal();
 
         // Create a controller.
